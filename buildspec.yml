@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $621753709886.dkr.ecr.us-east-1.amazonaws.com/springboot-app
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   build:
     commands:
@@ -17,7 +17,7 @@ phases:
       - echo Pushing the Docker image...
       - docker push $ECR_REPO_URI:latest
       - docker push $ECR_REPO_URI:$IMAGE_TAG
-      - printf '[{"name":"springboot-container","imageUri":"%s"}]' $ECR_REPO_URI:latest > imagedefinitions.json
+      - printf '[{"name":"springboot-container","imageUri":"%s"}]' $621753709886.dkr.ecr.us-east-1.amazonaws.com/springboot-app:latest > imagedefinitions.json
 
 artifacts:
   files:
