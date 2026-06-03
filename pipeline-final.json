@@ -1,0 +1,100 @@
+{
+    "pipeline":  {
+                     "name":  "inventory-task",
+                     "roleArn":  "arn:aws:iam::621753709886:role/inventory-codepipeline-role",
+                     "artifactStore":  {
+                                           "type":  "S3",
+                                           "location":  "inventory-pipeline-artifacts-621753709886"
+                                       },
+                     "stages":  [
+                                    {
+                                        "name":  "Source",
+                                        "actions":  [
+                                                        {
+                                                            "name":  "GitHub_Source",
+                                                            "actionTypeId":  {
+                                                                                 "category":  "Source",
+                                                                                 "owner":  "AWS",
+                                                                                 "provider":  "CodeStarSourceConnection",
+                                                                                 "version":  "1"
+                                                                             },
+                                                            "runOrder":  1,
+                                                            "configuration":  {
+                                                                                  "BranchName":  "main",
+                                                                                  "ConnectionArn":  "arn:aws:codeconnections:us-east-2:621753709886:connection/7f625f40-a346-4a82-b498-dd593b113663",
+                                                                                  "FullRepositoryId":  "rogerrobertson-ops/spring-boot",
+                                                                                  "OutputArtifactFormat":  "CODE_ZIP"
+                                                                              },
+                                                            "outputArtifacts":  [
+                                                                                    {
+                                                                                        "name":  "SourceOutput"
+                                                                                    }
+                                                                                ],
+                                                            "inputArtifacts":  [
+
+                                                                               ]
+                                                        }
+                                                    ]
+                                    },
+                                    {
+                                        "name":  "Build",
+                                        "actions":  [
+                                                        {
+                                                            "name":  "CodeBuild",
+                                                            "actionTypeId":  {
+                                                                                 "category":  "Build",
+                                                                                 "owner":  "AWS",
+                                                                                 "provider":  "CodeBuild",
+                                                                                 "version":  "1"
+                                                                             },
+                                                            "runOrder":  1,
+                                                            "configuration":  {
+                                                                                  "ProjectName":  "inventory-build"
+                                                                              },
+                                                            "outputArtifacts":  [
+                                                                                    {
+                                                                                        "name":  "BuildOutput"
+                                                                                    }
+                                                                                ],
+                                                            "inputArtifacts":  [
+                                                                                   {
+                                                                                       "name":  "SourceOutput"
+                                                                                   }
+                                                                               ]
+                                                        }
+                                                    ]
+                                    },
+                                    {
+                                        "name":  "Deploy",
+                                        "actions":  [
+                                                        {
+                                                            "name":  "ECS_Deploy",
+                                                            "actionTypeId":  {
+                                                                                 "category":  "Deploy",
+                                                                                 "owner":  "AWS",
+                                                                                 "provider":  "ECS",
+                                                                                 "version":  "1"
+                                                                             },
+                                                            "runOrder":  1,
+                                                            "configuration":  {
+                                                                                  "ClusterName":  "inventory-cluster",
+                                                                                  "FileName":  "imagedefinitions.json",
+                                                                                  "ServiceName":  "inventory-task-service"
+                                                                              },
+                                                            "outputArtifacts":  [
+
+                                                                                ],
+                                                            "inputArtifacts":  [
+                                                                                   {
+                                                                                       "name":  "BuildOutput"
+                                                                                   }
+                                                                               ]
+                                                        }
+                                                    ]
+                                    }
+                                ],
+                     "version":  1,
+                     "executionMode":  "QUEUED",
+                     "pipelineType":  "V2"
+                 }
+}
